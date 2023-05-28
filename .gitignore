@@ -1,3 +1,6 @@
 patches/
-dwm
+*.orig
+*.rej
 *.o
+
+dwm
