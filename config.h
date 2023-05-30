@@ -91,6 +91,8 @@ static const Layout layouts[] = {
 	{ "[@]",	spiral },
 	{ "[\\]",	dwindle },
 	{ "[D]",	deck },
+	{ "TTT",	bstack },
+	{ "===",	bstackhoriz },
 };
 
 /* key definitions */
@@ -181,6 +183,8 @@ static const Key keys[] = {
 	{ MODKEY,                       XK_o,      setlayout,      {.v = &layouts[5]} }, // spiral
 	{ MODKEY|ShiftMask,             XK_o,      setlayout,      {.v = &layouts[6]} }, // dwindle
 	{ MODKEY,             		XK_y,      setlayout,      {.v = &layouts[7]} }, // deck
+	{ MODKEY,             		XK_n,      setlayout,      {.v = &layouts[8]} }, // bstack
+	{ MODKEY|ShiftMask,		XK_n,      setlayout,      {.v = &layouts[9]} }, // bstackhoriz
 	{ MODKEY,                       XK_space,  setlayout,      {0} },
 	{ MODKEY|ShiftMask,             XK_space,  togglefloating, {0} },
 	{ MODKEY,                       XK_0,      view,           {.ui = ~0 } },
