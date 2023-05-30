@@ -2,24 +2,53 @@
 #include "fibonacci.c"
 
 /* appearance */
-static unsigned int borderpx	= 1;        /* border pixel of windows */
-static unsigned int snap	= 32;       /* snap pixel */
-static const int swallowfloating= 0;        /* 1 means swallow floating windows by default */
-static int showbar		= 1;        /* 0 means no bar */
-static int topbar		= 1;        /* 0 means bottom bar */
-static char font[]		= "monospace:size=10";
-static const char *fonts[]	= { font };
-static char dmenufont[]		= "monospace:size=10";
-static char normbgcolor[]	= "#222222";
-static char normbordercolor[]	= "#444444";
-static char normfgcolor[]	= "#bbbbbb";
-static char selfgcolor[]	= "#eeeeee";
-static char selbordercolor[]	= "#005577";
-static char selbgcolor[]	= "#005577";
-static char *colors[][3]	= {
-	/*               fg         	bg         	border   */
-	[SchemeNorm] = { normfgcolor, 	normbgcolor, 	normbordercolor },
-	[SchemeSel]  = { selfgcolor, 	selbgcolor,  	selbordercolor  },
+static unsigned int borderpx		= 1;        /* border pixel of windows */
+static unsigned int snap		= 32;       /* snap pixel */
+static const int swallowfloating	= 0;        /* 1 means swallow floating windows by default */
+static int showbar			= 1;        /* 0 means no bar */
+static int topbar			= 1;        /* 0 means bottom bar */
+
+static char font[]			= "monospace:size=10";
+static const char *fonts[]		= { font };
+static char dmenuFont[]			= "monospace:size=10";
+static char dmenuBgColor[]		= "#222222";
+static char dmenuTextColor[]		= "#bbbbbb";
+static char dmenuActiveTextColor[]	= "#eeeeee";
+static char dmenuActiveBgColor[]	= "#005577";
+static char layoutBgColor[]		= "#222222";
+static char layoutBorderColor[]		= "#444444";
+static char layoutTextColor[]		= "#bbbbbb";
+static char statusBgColor[]		= "#222222";
+static char statusBorderColor[]		= "#444444";
+static char statusTextColor[]		= "#bbbbbb";
+static char groupActiveBgColor[]	= "#222222";
+static char groupActiveBorderColor[]	= "#444444";
+static char groupActiveTextColor[]	= "#bbbbbb";
+static char groupBgColor[]		= "#222222";
+static char groupBorderColor[]		= "#444444";
+static char groupTextColor[]		= "#bbbbbb";
+static char tagActiveBgColor[]		= "#005577";
+static char tagActiveBorderColor[]	= "#005577";
+static char tagActiveTextColor[]	= "#eeeeee";
+static char tagBgColor[]		= "#222222";
+static char tagBorderColor[]		= "#444444";
+static char tagTextColor[]		= "#bbbbbb";
+static char winActiveBgColor[]		= "#005577";
+static char winActiveBorderColor[]	= "#005577";
+static char winActiveTextColor[]	= "#eeeeee";
+static char winBgColor[]		= "#222222";
+static char winBorderColor[]		= "#444444";
+static char winTextColor[]		= "#bbbbbb";
+
+static char *colors[][3]		= {
+	[SchemeLayout] = { layoutTextColor, layoutBgColor, layoutBorderColor },
+	[SchemeStatus] = { statusTextColor, statusBgColor, statusBorderColor },
+	[SchemeGroup] = { groupTextColor, groupBgColor, groupBorderColor },
+	[SchemeGroupActive] = { groupActiveTextColor, groupActiveBgColor, groupActiveBorderColor },
+	[SchemeTag] = { tagTextColor, tagBgColor, tagBorderColor },
+	[SchemeTagActive] = { tagActiveTextColor, tagActiveBgColor, tagActiveBorderColor },
+	[SchemeWin] = { winTextColor, winBgColor, winBorderColor },
+	[SchemeWinActive] = { winActiveTextColor, winActiveBgColor, winActiveBorderColor },
 };
 
 /* tagging */
@@ -42,6 +71,15 @@ static float mfact	= 0.55; /* factor of master area size [0.05..0.95] */
 static int nmaster	= 1;    /* number of clients in master area */
 static int resizehints	= 1;    /* 1 means respect size hints in tiled resizals */
 static const int lockfullscreen = 1; /* 1 will force focus on the fullscreen window */
+
+/* Bartabgroups properties */
+#define BARTAB_BORDERS 1       // 0 = off, 1 = on
+#define BARTAB_BOTTOMBORDER 1  // 0 = off, 1 = on
+#define BARTAB_TAGSINDICATOR 1 // 0 = off, 1 = on if >1 client/view tag, 2 = always on
+#define BARTAB_TAGSPX 5        // # pixels for tag grid boxes
+#define BARTAB_TAGSROWS 3      // # rows in tag grid (9 tags, e.g. 3x3)
+static void (*bartabmonfns[])(Monitor *) = { monocle /* , customlayoutfn */ };
+static void (*bartabfloatfns[])(Monitor *) = { NULL /* , customlayoutfn */ };
 
 static const Layout layouts[] = {
 	/* symbol	arrange function */
@@ -70,7 +108,7 @@ static const Layout layouts[] = {
 
 /* commands */
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
-static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenufont, "-nb", normbgcolor, "-nf", normfgcolor, "-sb", selbordercolor, "-sf", selfgcolor, NULL };
+static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenuFont, "-nb", dmenuBgColor, "-nf", dmenuTextColor, "-sb", dmenuActiveBgColor, "-sf", dmenuActiveTextColor, NULL };
 
 static const char *termcmd[]  = { "st", NULL };
 
@@ -78,21 +116,43 @@ static const char *termcmd[]  = { "st", NULL };
  * Xresources preferences to load at startup
  */
 ResourcePref resources[] = {
-	{ "font",               STRING,  &font },
-	{ "dmenufont",          STRING,  &dmenufont },
-	{ "normbgcolor",        STRING,  &normbgcolor },
-	{ "normbordercolor",    STRING,  &normbordercolor },
-	{ "normfgcolor",        STRING,  &normfgcolor },
-	{ "selbgcolor",         STRING,  &selbgcolor },
-	{ "selbordercolor",     STRING,  &selbordercolor },
-	{ "selfgcolor",         STRING,  &selfgcolor },
-	{ "borderpx",          	INTEGER, &borderpx },
-	{ "snap",		INTEGER, &snap },
-	{ "showbar",          	INTEGER, &showbar },
-	{ "topbar",          	INTEGER, &topbar },
-	{ "nmaster",          	INTEGER, &nmaster },
-	{ "resizehints",       	INTEGER, &resizehints },
-	{ "mfact",		FLOAT,   &mfact },
+	{ "font",               	STRING,		&font },
+	{ "dmenuFont",			STRING,		&dmenuFont },
+	{ "dmenuBgColor",		STRING, 	&dmenuBgColor },
+	{ "dmenuTextColor",		STRING, 	&dmenuTextColor },
+	{ "dmenuActiveTextColor",	STRING, 	&dmenuActiveTextColor },
+	{ "dmenuActiveBgColor",		STRING, 	&dmenuActiveBgColor },
+	{ "layoutBgColor",		STRING, 	&layoutBgColor },
+	{ "layoutBorderColor",		STRING, 	&layoutBorderColor },
+	{ "layoutTextColor",		STRING, 	&layoutTextColor },
+	{ "statusBgColor",		STRING, 	&statusBgColor },
+	{ "statusBorderColor",		STRING, 	&statusBorderColor },
+	{ "statusTextColor",		STRING, 	&statusTextColor },
+	{ "groupActiveBgColor",		STRING, 	&groupActiveBgColor },
+	{ "groupActiveBorderColor",	STRING, 	&groupActiveBorderColor },
+	{ "groupActiveTextColor",	STRING, 	&groupActiveTextColor },
+	{ "groupBgColor",		STRING, 	&groupBgColor },
+	{ "groupBorderColor",		STRING, 	&groupBorderColor },
+	{ "groupTextColor",		STRING, 	&groupTextColor },
+	{ "tagActiveBgColor",		STRING, 	&tagActiveBgColor },
+	{ "tagActiveBorderColor",	STRING, 	&tagActiveBorderColor },
+	{ "tagActiveTextColor",		STRING, 	&tagActiveTextColor },
+	{ "tagBgColor",			STRING, 	&tagBgColor },
+	{ "tagBorderColor",		STRING, 	&tagBorderColor },
+	{ "tagTextColor",		STRING, 	&tagTextColor },
+	{ "winActiveBgColor",		STRING, 	&winActiveBgColor },
+	{ "winActiveBorderColor",	STRING, 	&winActiveBorderColor },
+	{ "winActiveTextColor",		STRING, 	&winActiveTextColor },
+	{ "winBgColor",			STRING, 	&winBgColor },
+	{ "winBorderColor",		STRING, 	&winBorderColor },
+	{ "winTextColor",		STRING, 	&winTextColor },
+	{ "borderpx",          		INTEGER, 	&borderpx },
+	{ "snap",			INTEGER, 	&snap },
+	{ "showbar",          		INTEGER, 	&showbar },
+	{ "topbar",          		INTEGER, 	&topbar },
+	{ "nmaster",          		INTEGER, 	&nmaster },
+	{ "resizehints",       		INTEGER, 	&resizehints },
+	{ "mfact",			FLOAT,   	&mfact },
 };
 
 static const Key keys[] = {
