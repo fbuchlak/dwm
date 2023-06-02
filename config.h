@@ -41,6 +41,10 @@ static char winBgColor[]		= "#222222";
 static char winBorderColor[]		= "#444444";
 static char winTextColor[]		= "#bbbbbb";
 
+static const unsigned int alphaText = OPAQUE;
+static const unsigned int alphaBackground = 0xd0;
+static const unsigned int alphaBorder = OPAQUE;
+
 static char *colors[][3]		= {
 	[SchemeLayout] = { layoutTextColor, layoutBgColor, layoutBorderColor },
 	[SchemeStatus] = { statusTextColor, statusBgColor, statusBorderColor },
@@ -50,6 +54,18 @@ static char *colors[][3]		= {
 	[SchemeTagActive] = { tagActiveTextColor, tagActiveBgColor, tagActiveBorderColor },
 	[SchemeWin] = { winTextColor, winBgColor, winBorderColor },
 	[SchemeWinActive] = { winActiveTextColor, winActiveBgColor, winActiveBorderColor },
+};
+
+static const unsigned int alphas[][3]      = {
+	[SchemeLayout] = { alphaText, alphaBackground, alphaBorder },
+	[SchemeLayout] = { alphaText, alphaBackground, alphaBorder },
+	[SchemeStatus] = { alphaText, alphaBackground, alphaBorder },
+	[SchemeGroup] = { alphaText, alphaBackground, alphaBorder },
+	[SchemeGroupActive] = { alphaText, alphaBackground, alphaBorder },
+	[SchemeTag] = { alphaText, alphaBackground, alphaBorder },
+	[SchemeTagActive] = { alphaText, alphaBackground, alphaBorder },
+	[SchemeWin] = { alphaText, alphaBackground, alphaBorder },
+	[SchemeWinActive] = { alphaText, alphaBackground, alphaBorder },
 };
 
 /* tagging */
