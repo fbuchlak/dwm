@@ -74,11 +74,6 @@ static int resizehints	= 1;    /* 1 means respect size hints in tiled resizals *
 static const int lockfullscreen = 1; /* 1 will force focus on the fullscreen window */
 
 /* Bartabgroups properties */
-#define BARTAB_BORDERS 1       // 0 = off, 1 = on
-#define BARTAB_BOTTOMBORDER 1  // 0 = off, 1 = on
-#define BARTAB_TAGSINDICATOR 1 // 0 = off, 1 = on if >1 client/view tag, 2 = always on
-#define BARTAB_TAGSPX 5        // # pixels for tag grid boxes
-#define BARTAB_TAGSROWS 3      // # rows in tag grid (9 tags, e.g. 3x3)
 static void (*bartabmonfns[])(Monitor *) = { monocle /* , customlayoutfn */ };
 static void (*bartabfloatfns[])(Monitor *) = { NULL /* , customlayoutfn */ };
 
@@ -88,7 +83,6 @@ static const Layout layouts[] = {
 	{ "><>",	NULL },    /* no layout function means floating behavior */
 	{ "[M]",	monocle },
 	{ "|M|",	centeredmaster },
-	{ ">M>",	centeredfloatingmaster },
 	{ "[@]",	spiral },
 	{ "[\\]",	dwindle },
 	{ "[D]",	deck },
@@ -181,12 +175,11 @@ static const Key keys[] = {
 	{ MODKEY,                       XK_f,      setlayout,      {.v = &layouts[1]} }, // float
 	{ MODKEY,                       XK_m,      setlayout,      {.v = &layouts[2]} }, // monocle
 	{ MODKEY,                       XK_u,      setlayout,      {.v = &layouts[3]} }, // centeredmaster
-	{ MODKEY|ShiftMask,		XK_u,      setlayout,      {.v = &layouts[4]} }, // centeredfloatingmaster
-	{ MODKEY,                       XK_o,      setlayout,      {.v = &layouts[5]} }, // spiral
-	{ MODKEY|ShiftMask,             XK_o,      setlayout,      {.v = &layouts[6]} }, // dwindle
-	{ MODKEY,             		XK_y,      setlayout,      {.v = &layouts[7]} }, // deck
-	{ MODKEY,             		XK_n,      setlayout,      {.v = &layouts[8]} }, // bstack
-	{ MODKEY|ShiftMask,		XK_n,      setlayout,      {.v = &layouts[9]} }, // bstackhoriz
+	{ MODKEY,                       XK_o,      setlayout,      {.v = &layouts[4]} }, // spiral
+	{ MODKEY|ShiftMask,             XK_o,      setlayout,      {.v = &layouts[5]} }, // dwindle
+	{ MODKEY,             		XK_y,      setlayout,      {.v = &layouts[6]} }, // deck
+	{ MODKEY,             		XK_n,      setlayout,      {.v = &layouts[7]} }, // bstack
+	{ MODKEY|ShiftMask,		XK_n,      setlayout,      {.v = &layouts[8]} }, // bstackhoriz
 	{ MODKEY,                       XK_space,  setlayout,      {0} },
 	{ MODKEY|ShiftMask,             XK_space,  togglefloating, {0} },
 	{ MODKEY,                       XK_0,      view,           {.ui = ~0 } },

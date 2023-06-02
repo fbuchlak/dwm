@@ -279,7 +279,6 @@ static void bstackhoriz(Monitor *m);
 static void load_xresources(void);
 static void resource_load(XrmDatabase db, char *name, enum resource_type rtype, void *dst);
 static void centeredmaster(Monitor *m);
-static void centeredfloatingmaster(Monitor *m);
 
 static pid_t getparentprocess(pid_t p);
 static int isdescprocess(pid_t p, pid_t c);
@@ -449,32 +448,12 @@ bartabdraw(Monitor *m, Client *c, int unused, int x, int w, int groupactive) {
 	drw_text(drw, x, 0, w, bh, lrpad / 2, c->name, 0);
 
 	// Floating win indicator
-	if (c->isfloating) drw_rect(drw, x + 2, 2, 5, 5, 0, 0);
-
-	// Optional borders between tabs
-	if (BARTAB_BORDERS) {
-		XSetForeground(drw->dpy, drw->gc, drw->scheme[ColBorder].pixel);
-		XFillRectangle(drw->dpy, drw->drawable, drw->gc, x, 0, 1, bh);
-		XFillRectangle(drw->dpy, drw->drawable, drw->gc, x + w, 0, 1, bh);
-	}
+	// if (c->isfloating) drw_rect(drw, x + 2, 2, 5, 5, 0, 0);
 
 	// Optional tags icons
 	for (i = 0; i < LENGTH(tags); i++) {
 		if ((m->tagset[m->seltags] >> i) & 1) { nviewtags++; }
 		if ((c->tags >> i) & 1) { nclienttags++; }
-	}
-	if (BARTAB_TAGSINDICATOR == 2 || nclienttags > 1 || nviewtags > 1) {
-		for (i = 0; i < LENGTH(tags); i++) {
-			drw_rect(drw,
-				( x + w - 2 - ((LENGTH(tags) / BARTAB_TAGSROWS) * BARTAB_TAGSPX)
-					- (i % (LENGTH(tags)/BARTAB_TAGSROWS)) + ((i % (LENGTH(tags) / BARTAB_TAGSROWS)) * BARTAB_TAGSPX)
-				),
-				( 2 + ((i / (LENGTH(tags)/BARTAB_TAGSROWS)) * BARTAB_TAGSPX)
-					- ((i / (LENGTH(tags)/BARTAB_TAGSROWS)))
-				),
-				BARTAB_TAGSPX, BARTAB_TAGSPX, (c->tags >> i) & 1, 0
-			);
-		}
 	}
 }
 
@@ -948,9 +927,6 @@ void
 drawbar(Monitor *m)
 {
 	int x, w, tw = 0;
-	int tlpad;
-	int boxs = drw->fonts->h / 9;
-	int boxw = drw->fonts->h / 6 + 2;
 	unsigned int i, occ = 0, urg = 0;
 	Client *c;
 
@@ -1001,10 +977,6 @@ drawbar(Monitor *m)
 
 	if ((w = m->ww - tw - x) > bh) {
 		bartabcalculate(m, x, tw, -1, bartabdraw);
-		if (BARTAB_BOTTOMBORDER) {
-			drw_setscheme(drw, scheme[SchemeGroupActive]);
-			drw_rect(drw, 0, bh - 1, m->ww, 1, 1, 0);
- 		}
 	}
 	drw_map(drw, m->barwin, 0, 0, m->ww, bh);
 }
@@ -2784,54 +2756,6 @@ centeredmaster(Monitor *m)
 			       tw - (2*c->bw), h - (2*c->bw), 0);
 			oty += HEIGHT(c);
 		}
-	}
-}
-
-void
-centeredfloatingmaster(Monitor *m)
-{
-	unsigned int i, n, w, mh, mw, mx, mxo, my, myo, tx;
-	Client *c;
-
-	/* count number of clients in the selected monitor */
-	for (n = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), n++);
-	if (n == 0)
-		return;
-
-	/* initialize nmaster area */
-	if (n > m->nmaster) {
-		/* go mfact box in the center if more than nmaster clients */
-		if (m->ww > m->wh) {
-			mw = m->nmaster ? m->ww * m->mfact : 0;
-			mh = m->nmaster ? m->wh * 0.9 : 0;
-		} else {
-			mh = m->nmaster ? m->wh * m->mfact : 0;
-			mw = m->nmaster ? m->ww * 0.9 : 0;
-		}
-		mx = mxo = (m->ww - mw) / 2;
-		my = myo = (m->wh - mh) / 2;
-	} else {
-		/* go fullscreen if all clients are in the master area */
-		mh = m->wh;
-		mw = m->ww;
-		mx = mxo = 0;
-		my = myo = 0;
-	}
-
-	for(i = tx = 0, c = nexttiled(m->clients); c; c = nexttiled(c->next), i++)
-	if (i < m->nmaster) {
-		/* nmaster clients are stacked horizontally, in the center
-		 * of the screen */
-		w = (mw + mxo - mx) / (MIN(n, m->nmaster) - i);
-		resize(c, m->wx + mx, m->wy + my, w - (2*c->bw),
-		       mh - (2*c->bw), 0);
-		mx += WIDTH(c);
-	} else {
-		/* stack clients are stacked horizontally */
-		w = (m->ww - tx) / (n - i);
-		resize(c, m->wx + tx, m->wy, w - (2*c->bw),
-		       m->wh - (2*c->bw), 0);
-		tx += WIDTH(c);
 	}
 }
 
