@@ -11,61 +11,32 @@ static int topbar			= 1;        /* 0 means bottom bar */
 
 static char font[]			= "monospace:size=10";
 static const char *fonts[]		= { font };
+
 static char dmenuFont[]			= "monospace:size=10";
 static char dmenuBgColor[]		= "#222222";
 static char dmenuTextColor[]		= "#bbbbbb";
-static char dmenuActiveTextColor[]	= "#eeeeee";
-static char dmenuActiveBgColor[]	= "#005577";
-static char layoutBgColor[]		= "#222222";
-static char layoutBorderColor[]		= "#444444";
-static char layoutTextColor[]		= "#bbbbbb";
-static char statusBgColor[]		= "#222222";
-static char statusBorderColor[]		= "#444444";
-static char statusTextColor[]		= "#bbbbbb";
-static char groupActiveBgColor[]	= "#222222";
-static char groupActiveBorderColor[]	= "#444444";
-static char groupActiveTextColor[]	= "#bbbbbb";
-static char groupBgColor[]		= "#222222";
-static char groupBorderColor[]		= "#444444";
-static char groupTextColor[]		= "#bbbbbb";
-static char tagActiveBgColor[]		= "#005577";
-static char tagActiveBorderColor[]	= "#005577";
-static char tagActiveTextColor[]	= "#eeeeee";
-static char tagBgColor[]		= "#222222";
-static char tagBorderColor[]		= "#444444";
-static char tagTextColor[]		= "#bbbbbb";
-static char winActiveBgColor[]		= "#005577";
-static char winActiveBorderColor[]	= "#005577";
-static char winActiveTextColor[]	= "#eeeeee";
-static char winBgColor[]		= "#222222";
-static char winBorderColor[]		= "#444444";
-static char winTextColor[]		= "#bbbbbb";
+static char dmenuTextColorActive[]	= "#eeeeee";
+static char dmenuBgColorActive[]	= "#005577";
+
+static char backgroundColor[]		= "#222222";
+static char borderColor[]		= "#222222";
+static char textColor[]			= "#bbbbbb";
+static char backgroundColorActive[]	= "#005577";
+static char borderColorActive[]		= "#005577";
+static char textColorActive[]		= "#eeeeee";
 
 static const unsigned int alphaText = OPAQUE;
 static const unsigned int alphaBackground = 0xd0;
 static const unsigned int alphaBorder = OPAQUE;
 
 static char *colors[][3]		= {
-	[SchemeLayout] = { layoutTextColor, layoutBgColor, layoutBorderColor },
-	[SchemeStatus] = { statusTextColor, statusBgColor, statusBorderColor },
-	[SchemeGroup] = { groupTextColor, groupBgColor, groupBorderColor },
-	[SchemeGroupActive] = { groupActiveTextColor, groupActiveBgColor, groupActiveBorderColor },
-	[SchemeTag] = { tagTextColor, tagBgColor, tagBorderColor },
-	[SchemeTagActive] = { tagActiveTextColor, tagActiveBgColor, tagActiveBorderColor },
-	[SchemeWin] = { winTextColor, winBgColor, winBorderColor },
-	[SchemeWinActive] = { winActiveTextColor, winActiveBgColor, winActiveBorderColor },
+	[SchemeNorm] = { textColor, backgroundColor, borderColor },
+	[SchemeSel] = { textColorActive, backgroundColorActive, borderColorActive },
 };
 
 static const unsigned int alphas[][3]      = {
-	[SchemeLayout] = { alphaText, alphaBackground, alphaBorder },
-	[SchemeLayout] = { alphaText, alphaBackground, alphaBorder },
-	[SchemeStatus] = { alphaText, alphaBackground, alphaBorder },
-	[SchemeGroup] = { alphaText, alphaBackground, alphaBorder },
-	[SchemeGroupActive] = { alphaText, alphaBackground, alphaBorder },
-	[SchemeTag] = { alphaText, alphaBackground, alphaBorder },
-	[SchemeTagActive] = { alphaText, alphaBackground, alphaBorder },
-	[SchemeWin] = { alphaText, alphaBackground, alphaBorder },
-	[SchemeWinActive] = { alphaText, alphaBackground, alphaBorder },
+	[SchemeNorm] = { alphaText, alphaBackground, alphaBorder },
+	[SchemeSel] = { alphaText, alphaBackground, alphaBorder },
 };
 
 /* tagging */
@@ -121,7 +92,7 @@ static const Layout layouts[] = {
 
 /* commands */
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
-static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenuFont, "-nb", dmenuBgColor, "-nf", dmenuTextColor, "-sb", dmenuActiveBgColor, "-sf", dmenuActiveTextColor, NULL };
+static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", dmenuFont, "-nb", dmenuBgColor, "-nf", dmenuTextColor, "-sb", dmenuBgColorActive, "-sf", dmenuTextColorActive, NULL };
 
 static const char *termcmd[]  = { "st", NULL };
 
@@ -133,32 +104,14 @@ ResourcePref resources[] = {
 	{ "dmenuFont",			STRING,		&dmenuFont },
 	{ "dmenuBgColor",		STRING, 	&dmenuBgColor },
 	{ "dmenuTextColor",		STRING, 	&dmenuTextColor },
-	{ "dmenuActiveTextColor",	STRING, 	&dmenuActiveTextColor },
-	{ "dmenuActiveBgColor",		STRING, 	&dmenuActiveBgColor },
-	{ "layoutBgColor",		STRING, 	&layoutBgColor },
-	{ "layoutBorderColor",		STRING, 	&layoutBorderColor },
-	{ "layoutTextColor",		STRING, 	&layoutTextColor },
-	{ "statusBgColor",		STRING, 	&statusBgColor },
-	{ "statusBorderColor",		STRING, 	&statusBorderColor },
-	{ "statusTextColor",		STRING, 	&statusTextColor },
-	{ "groupActiveBgColor",		STRING, 	&groupActiveBgColor },
-	{ "groupActiveBorderColor",	STRING, 	&groupActiveBorderColor },
-	{ "groupActiveTextColor",	STRING, 	&groupActiveTextColor },
-	{ "groupBgColor",		STRING, 	&groupBgColor },
-	{ "groupBorderColor",		STRING, 	&groupBorderColor },
-	{ "groupTextColor",		STRING, 	&groupTextColor },
-	{ "tagActiveBgColor",		STRING, 	&tagActiveBgColor },
-	{ "tagActiveBorderColor",	STRING, 	&tagActiveBorderColor },
-	{ "tagActiveTextColor",		STRING, 	&tagActiveTextColor },
-	{ "tagBgColor",			STRING, 	&tagBgColor },
-	{ "tagBorderColor",		STRING, 	&tagBorderColor },
-	{ "tagTextColor",		STRING, 	&tagTextColor },
-	{ "winActiveBgColor",		STRING, 	&winActiveBgColor },
-	{ "winActiveBorderColor",	STRING, 	&winActiveBorderColor },
-	{ "winActiveTextColor",		STRING, 	&winActiveTextColor },
-	{ "winBgColor",			STRING, 	&winBgColor },
-	{ "winBorderColor",		STRING, 	&winBorderColor },
-	{ "winTextColor",		STRING, 	&winTextColor },
+	{ "dmenuTextColorActive",	STRING, 	&dmenuTextColorActive },
+	{ "dmenuBgColorActive",		STRING, 	&dmenuBgColorActive },
+	{ "backgroundColor", 		STRING,		&backgroundColor },
+	{ "borderColor", 		STRING,		&borderColor },
+	{ "textColor", 			STRING,		&textColor },
+	{ "backgroundColorActive", 	STRING,		&backgroundColorActive },
+	{ "borderColorActive", 		STRING,		&borderColorActive },
+	{ "textColorActive", 		STRING,		&textColorActive },
 	{ "borderpx",          		INTEGER, 	&borderpx },
 	{ "gappx",          		INTEGER, 	&gappx },
 	{ "snap",			INTEGER, 	&snap },

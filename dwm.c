@@ -68,14 +68,8 @@
 /* enums */
 enum { CurNormal, CurResize, CurMove, CurLast }; /* cursor */
 enum { 
-	SchemeLayout,
-	SchemeStatus,
-	SchemeGroup,
-	SchemeGroupActive,
-	SchemeTag,
-	SchemeTagActive,
-	SchemeWin,
-	SchemeWinActive,
+	SchemeNorm,
+	SchemeSel,
 };
 enum { NetSupported, NetWMName, NetWMState, NetWMCheck,
        NetWMFullscreen, NetActiveWindow, NetWMWindowType,
@@ -457,7 +451,7 @@ bartabdraw(Monitor *m, Client *c, int unused, int x, int w, int groupactive) {
 	if (!c) return;
 	int i, nclienttags = 0, nviewtags = 0;
 
-	drw_setscheme(drw, scheme[m->sel == c ? SchemeWinActive : (groupactive ? SchemeGroupActive : SchemeGroup)]);
+	drw_setscheme(drw, scheme[m->sel == c ? SchemeSel : SchemeNorm]);
 	drw_text(drw, x, 0, w, bh, lrpad / 2, c->name, 0);
 
 	// Floating win indicator
@@ -969,7 +963,7 @@ drawbar(Monitor *m)
 
 	/* draw status first so it can be overdrawn by tags later */
 	char *text, *s, ch;
-	drw_setscheme(drw, scheme[SchemeStatus]);
+	drw_setscheme(drw, scheme[SchemeNorm]);
 
 	x = 0;
 	for (text = s = stext; *s; s++) {
@@ -998,12 +992,12 @@ drawbar(Monitor *m)
 		if(!(occ & 1 << i || m->tagset[m->seltags] & 1 << i))
 			continue;
 		w = TEXTW(tags[i]);
-		drw_setscheme(drw, scheme[m->tagset[m->seltags] & 1 << i ? SchemeTagActive : SchemeTag]);
+		drw_setscheme(drw, scheme[m->tagset[m->seltags] & 1 << i ? SchemeSel : SchemeNorm]);
 		drw_text(drw, x, 0, w, bh, lrpad / 2, tags[i], urg & 1 << i);
 		x += w;
 	}
 	w = TEXTW(m->ltsymbol);
-	drw_setscheme(drw, scheme[SchemeLayout]);
+	drw_setscheme(drw, scheme[SchemeNorm]);
 	x = drw_text(drw, x, 0, w, bh, lrpad / 2, m->ltsymbol, 0);
 
 	// Draw bartabgroups
@@ -1068,7 +1062,7 @@ focus(Client *c)
 		detachstack(c);
 		attachstack(c);
 		grabbuttons(c, 1);
-		XSetWindowBorder(dpy, c->win, scheme[SchemeWinActive][ColBorder].pixel);
+		XSetWindowBorder(dpy, c->win, scheme[SchemeSel][ColBorder].pixel);
 		setfocus(c);
 	} else {
 		XSetInputFocus(dpy, root, RevertToPointerRoot, CurrentTime);
@@ -1399,7 +1393,7 @@ manage(Window w, XWindowAttributes *wa)
 
 	wc.border_width = c->bw;
 	XConfigureWindow(dpy, w, CWBorderWidth, &wc);
-	XSetWindowBorder(dpy, w, scheme[SchemeWin][ColBorder].pixel);
+	XSetWindowBorder(dpy, w, scheme[SchemeNorm][ColBorder].pixel);
 	configure(c); /* propagates border_width, if size doesn't change */
 	updatewindowtype(c);
 	updatesizehints(c);
@@ -2194,7 +2188,7 @@ unfocus(Client *c, int setfocus)
 	if (!c)
 		return;
 	grabbuttons(c, 0);
-	XSetWindowBorder(dpy, c->win, scheme[SchemeWin][ColBorder].pixel);
+	XSetWindowBorder(dpy, c->win, scheme[SchemeNorm][ColBorder].pixel);
 	if (setfocus) {
 		XSetInputFocus(dpy, root, RevertToPointerRoot, CurrentTime);
 		XDeleteProperty(dpy, root, netatom[NetActiveWindow]);
