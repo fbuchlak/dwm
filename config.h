@@ -98,6 +98,8 @@ static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", font, "-nb
 
 static const char *termcmd[]  = { "st", NULL };
 
+static const char *lockcmd[]  = { "slock", NULL };
+
 /* Xresources preferences to load at startup */
 ResourcePref resources[] = {
     { "font",           STRING,   &font           },
@@ -187,6 +189,7 @@ static const Key keys[] = {
     /* modifier                     key        function        argument             */
     { MODKEY|ShiftMask,             XK_x,      killunsel,      { 0 }                },
     { MODKEY|ShiftMask,             XK_c,      killclient,     { 0 }                },
+    { Mod1Mask|Mod4Mask,            XK_l,      spawn,          { .v = lockcmd }     }, // lock
     { MODKEY|ShiftMask,             XK_r,      quit,           { 1 }                }, // restart
     { MODKEY|ControlMask|ShiftMask, XK_q,      quit,           { 0 }                }, // quit
 };
