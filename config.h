@@ -68,15 +68,15 @@ static void (*bartabfloatfns[])(Monitor *) = { NULL    /* , customlayoutfn */ };
 /* first entry is default */
 static const Layout layouts[] = {
     /* symbol arrange function */
-    { "[]=",  tile            },
-    { "><>",  NULL            }, // floating
-    { "[M]",  monocle         },
-    { "|M|",  centeredmaster  },
-    { "[@]",  spiral          },
-    { "[\\]", dwindle         },
-    { "[D]",  deck            },
-    { "TTT",  bstack          },
-    { "===",  bstackhoriz     },
+    { "", tile            },
+    { "󰀜", NULL            }, // floating
+    { "󰖯", monocle         },
+    { "󰣉", centeredmaster  },
+    { "", spiral          },
+    { "󱥧", dwindle         },
+    { "󱢡", deck            },
+    { "󱂩", bstack          },
+    { "", bstackhoriz     },
 };
 
 /* key definitions */
@@ -94,7 +94,17 @@ static const Layout layouts[] = {
 
 /* commands */
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
-static const char *dmenucmd[] = { "dmenu_run", "-m", dmenumon, "-fn", font, "-nb", bgColor, "-nf", fgColor, "-sb", bgColorActive, "-sf", fgColorActive, NULL };
+static const char *dmenucmd[] = {
+  "dmenu_run",
+  "-m", dmenumon,
+  "-p", " ",
+  "-fn", font,
+  "-nb", bgColor,
+  "-nf", fgColor,
+  "-sb", bgColorActive,
+  "-sf", fgColorActive,
+  NULL
+};
 
 static const char *termcmd[]  = { "st", NULL };
 
