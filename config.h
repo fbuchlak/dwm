@@ -106,9 +106,12 @@ static const char *dmenucmd[] = {
   NULL
 };
 
-static const char *termcmd[]  = { "st", NULL };
+static const char *lockcmd[]    = { "slock", NULL };
+static const char *nactioncmd[] = { "dunstctl", "action", NULL };
+static const char *ncallcmd[]   = { "dunstctl", "close", NULL };
+static const char *nclastcmd[]  = { "dunstctl", "close-all", NULL };
+static const char *termcmd[]    = { "st", NULL };
 
-static const char *lockcmd[]  = { "slock", NULL };
 
 /* Xresources preferences to load at startup */
 ResourcePref resources[] = {
@@ -195,6 +198,11 @@ static const Key keys[] = {
     TAGKEYS(                        XK_7,                      6                    )
     TAGKEYS(                        XK_8,                      7                    )
     TAGKEYS(                        XK_9,                      8                    )
+    /*--- Notifications ------------------------------------------------------------*/
+    /* modifier                     key        function        argument             */
+    { MODKEY,                       XK_q,      spawn,          { .v = ncallcmd }    },
+    { MODKEY,                       XK_w,      spawn,          { .v = nclastcmd }   },
+    { MODKEY,                       XK_e,      spawn,          { .v = nactioncmd }  },
     /*--- Kill ---------------------------------------------------------------------*/
     /* modifier                     key        function        argument             */
     { MODKEY|ShiftMask,             XK_x,      killunsel,      { 0 }                },
