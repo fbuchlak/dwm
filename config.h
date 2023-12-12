@@ -15,11 +15,11 @@ static int topbar                 = 1;  /* 0 means bottom bar */
 static char font[]                = "monospace:size=10";
 static const char *fonts[]        = { font };
 
-static char bgColor[]       = "#222222"; // background color 
+static char bgColor[]       = "#222222"; // background color
 static char boColor[]       = "#222222"; // border color
 static char fgColor[]       = "#bbbbbb"; // text color
 
-static char bgColorActive[] = "#005577"; // background color 
+static char bgColorActive[] = "#005577"; // background color
 static char boColorActive[] = "#005577"; // border color
 static char fgColorActive[] = "#eeeeee"; // text color
 
@@ -92,12 +92,25 @@ static const Layout layouts[] = {
 
 #define STATUSBAR "dwmblocks"
 
+static const int dmenudesktop = 1; /* 1 means dmenu will use only desktop files from [/usr/share/applications/] */
+
 /* commands */
 static char dmenumon[2] = "0"; /* component of dmenucmd, manipulated in spawn() */
 static const char *dmenucmd[] = {
   "dmenu_run",
   "-m", dmenumon,
-  "-p", " ",
+  "-p", " ",
+  "-fn", font,
+  "-nb", bgColor,
+  "-nf", fgColor,
+  "-sb", bgColorActive,
+  "-sf", fgColorActive,
+  NULL
+};
+static const char *desktopcmd[] = {
+  "dmenu_run_desktop",
+  "-m", dmenumon,
+  "-p", " ",
   "-fn", font,
   "-nb", bgColor,
   "-nf", fgColor,
@@ -147,10 +160,11 @@ static const Key keys[] = {
     { MODKEY,                       XK_y,      setlayout,      { .v = &layouts[6] } }, // deck
     { MODKEY,                       XK_i,      setlayout,      { .v = &layouts[7] } }, // bstack
     { MODKEY|ShiftMask,             XK_i,      setlayout,      { .v = &layouts[8] } }, // bstackhoriz
-    { MODKEY,                       XK_space,  togglefloating, { 0 }                }, 
+    { MODKEY,                       XK_space,  togglefloating, { 0 }                },
     /*--- Execute ------------------------------------------------------------------*/
     /* modifier                     key        function        argument             */
-    { MODKEY,                       XK_p,      spawn,          { .v = dmenucmd }    },
+    { MODKEY,                       XK_p,      spawn,          { .v = desktopcmd }  },
+    { MODKEY|ShiftMask,             XK_p,      spawn,          { .v = dmenucmd }    },
     { MODKEY|ShiftMask,             XK_Return, spawn,          { .v = termcmd }     },
     /*--- Stack --------------------------------------------------------------------*/
     /* modifier                     key        function        argument             */
@@ -161,7 +175,7 @@ static const Key keys[] = {
     { MODKEY,                       XK_l,      setmfact,       { .f = +0.05 }       },
     { MODKEY|ShiftMask,             XK_j,      inplacerotate,  { .i = +1 }          }, // rotate master/stack
     { MODKEY|ShiftMask,             XK_k,      inplacerotate,  { .i = -1 }          }, // rotate master/stack
-    { MODKEY|ShiftMask,             XK_h,      inplacerotate,  { .i = +2 }          }, // rotate all 
+    { MODKEY|ShiftMask,             XK_h,      inplacerotate,  { .i = +2 }          }, // rotate all
     { MODKEY|ShiftMask,             XK_l,      inplacerotate,  { .i = -2 }          }, // rotate all
     { MODKEY|ControlMask|ShiftMask, XK_j,      incnmaster,     { .i = -1 }          },
     { MODKEY|ControlMask|ShiftMask, XK_k,      incnmaster,     { .i = +1 }          },
